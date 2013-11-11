@@ -6,23 +6,57 @@
 
 package Classes;
 
+import Interfaces.JDOMSerializable;
+import org.jdom2.Element;
+
 /**
  *
  * @author Valentin
  */
-public class Message {
+public class Message implements JDOMSerializable{
     
     private static int  currentID = 0;
     private int         id;
-    private Utilisateur expediteur;
+    private String      expediteur;
     private String      contenu;
     private int         conversationId;
     
-    public Message(Utilisateur _expediteur, String _contenu, int _conversationId)
+    public Message(String _login, String _contenu)
     {
         this.id = Message.currentID++;
-        this.expediteur = _expediteur;
+        this.expediteur = _login;
         this.contenu = _contenu;
-        this.conversationId = _conversationId;
+        this.conversationId = -1;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getExpediteur() {
+        return expediteur;
+    }
+
+    public String getContenu() {
+        return contenu;
+    }
+
+    public int getConversationId() {
+        return conversationId;
+    }
+
+    @Override
+    public Element toElement() {
+        Element eMessage = new Element("Message");
+        
+        Element eLogin = new Element("Login", this.getExpediteur());
+        Element eContenu = new Element("Contenu", this.getContenu());
+        
+        eMessage.addContent(eLogin);
+        eMessage.addContent(eContenu);
+        
+        return eMessage;
+    }
+    
+    
 }

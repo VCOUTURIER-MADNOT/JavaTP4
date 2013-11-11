@@ -6,13 +6,15 @@
 
 package Classes;
 
+import Interfaces.JDOMSerializable;
 import java.util.Objects;
+import org.jdom2.Element;
 
 /**
  *
  * @author Valentin
  */
-public class Utilisateur {
+public class Utilisateur implements JDOMSerializable{
 
     private String  login;
     private String  password;
@@ -65,9 +67,6 @@ public class Utilisateur {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
         final Utilisateur other = (Utilisateur) obj;
         if (!Objects.equals(this.login, other.login)) {
             return false;
@@ -78,6 +77,23 @@ public class Utilisateur {
     @Override
     public String toString() {
         return "Utilisateur{" + "login=" + login + ", password=" + password + ", nom=" + nom + ", userLevel=" + userLevel + '}';
+    }
+
+    @Override
+    public Element toElement() {
+        Element eUtilisateur = new Element("Utilisateur");
+        
+        Element eLogin = new Element("Login", this.getLogin());
+        Element ePassword = new Element("Password", this.getPassword());
+        Element eNom = new Element("Nom", this.getNom());
+        Element eUsrLvl = new Element ("UserLevel", String.valueOf(this.getUserLevel()));
+        
+        eUtilisateur.addContent(eLogin);
+        eUtilisateur.addContent(ePassword);
+        eUtilisateur.addContent(eNom);
+        eUtilisateur.addContent(eUsrLvl);
+        
+        return eUtilisateur;        
     }
     
 }
