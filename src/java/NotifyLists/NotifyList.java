@@ -106,4 +106,11 @@ public abstract class NotifyList<E> extends ArrayList<E> {
 	    System.out.println("Fichier " + this.xmlUrl + " sauvegard�.");
 	}
 	
+        public void clear()
+        {
+            this.reload();
+            super.clear();
+            this.racine.removeContent();
+            this.saveXml();
+        }
 }

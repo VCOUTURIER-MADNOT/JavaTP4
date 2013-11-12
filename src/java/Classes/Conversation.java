@@ -6,7 +6,6 @@
 
 package Classes;
 
-import Interfaces.JDOMSerializable;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.jdom2.Element;
@@ -15,9 +14,9 @@ import org.jdom2.Element;
  *
  * @author Valentin
  */
-public class Conversation implements JDOMSerializable{ 
+public class Conversation{ 
     
-    private static int          currentId = 0;
+    private static int          currentID = 0;
     private int                 id;
     private String              intermediaire;
     private ArrayList<Message>  messages;
@@ -26,16 +25,34 @@ public class Conversation implements JDOMSerializable{
     public int getId() {
         return id;
     }
-       
+    
     public Conversation(String _login, int _annonceId)
     {
         int[] i= new int[5];
-        this.id = currentId++;
+        this.id = currentID++;
+        this.intermediaire = _login;
+        this.messages = new ArrayList<>();
+        this.annonceId = _annonceId;
+    }
+    
+    //Constructeur nécessaire à la reconstruction des objets à partir du XML
+    public Conversation(int _id, String _login, int _annonceId)
+    {
+        int[] i= new int[5];
+        this.id = _id;
+        if(currentID <= this.id)
+        {
+            currentID = this.id + 1;
+        }
         this.intermediaire = _login;
         this.messages = new ArrayList<>();
         this.annonceId = _annonceId;
     }
 
+    public ArrayList<Message> getMessages() {
+        return messages;
+    }
+    
     public int getAnnonceId() {
         return annonceId;
     }
@@ -62,7 +79,7 @@ public class Conversation implements JDOMSerializable{
         return true;
     }
     
-    public void addMessage(Message _message)
+    public void add(Message _message)
     {
         if(!this.messages.contains(_message))
         {
@@ -70,7 +87,7 @@ public class Conversation implements JDOMSerializable{
         }
     }
     
-    public void removeMessage(int _idMessage)
+    public void remove(int _idMessage)
     {
         for(int i= 0; i<this.messages.size(); i++)
         {
@@ -81,7 +98,6 @@ public class Conversation implements JDOMSerializable{
         }
     }
 
-    @Override
     public Element toElement() {
         Element eConversation = new Element("Conversation");
         

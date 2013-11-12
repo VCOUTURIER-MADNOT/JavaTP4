@@ -6,7 +6,6 @@
 
 package Classes;
 
-import Interfaces.JDOMSerializable;
 import java.util.Objects;
 import org.jdom2.Element;
 
@@ -14,7 +13,7 @@ import org.jdom2.Element;
  *
  * @author Valentin
  */
-public class Utilisateur implements JDOMSerializable{
+public class Utilisateur{
 
     private String  login;
     private String  password;
@@ -79,7 +78,6 @@ public class Utilisateur implements JDOMSerializable{
         return "Utilisateur{" + "login=" + login + ", password=" + password + ", nom=" + nom + ", userLevel=" + userLevel + '}';
     }
 
-    @Override
     public Element toElement() {
         Element eUtilisateur = new Element("Utilisateur");
         
@@ -97,5 +95,3 @@ public class Utilisateur implements JDOMSerializable{
     }
     
 }
-
-

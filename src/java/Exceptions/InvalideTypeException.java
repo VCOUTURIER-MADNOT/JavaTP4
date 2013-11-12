@@ -4,15 +4,12 @@
  * and open the template in the editor.
  */
 
-package Interfaces;
-
-import org.jdom2.Element;
+package Exceptions;
 
 /**
  *
  * @author Valentin
  */
-public interface JDOMSerializable {
+public class InvalideTypeException extends Exception{
     
-    public Element toElement();
 }

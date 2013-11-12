@@ -7,8 +7,9 @@
 package Classes;
 
 import Exceptions.BannedUserException;
+import Exceptions.IncompatibleUserLevelException;
 import Exceptions.UserAlreadyBannedException;
-import Interfaces.JDOMSerializable;
+import Gestionnaires.GestionnaireUtilisateurs;
 import java.util.ArrayList;
 import NotifyLists.ConversationNotifyList;
 import org.jdom2.Element;
@@ -17,7 +18,7 @@ import org.jdom2.Element;
  *
  * @author Valentin
  */
-public class Annonce implements JDOMSerializable{
+public class Annonce{
     
     private static int                currentID = 0;
     private int                       id;
@@ -27,15 +28,29 @@ public class Annonce implements JDOMSerializable{
     private ArrayList<String>         bannis;
     private String                    type;
     
-    public Annonce(Utilisateur _auteur, String _contenu, String _type)
+    public Annonce(String _login, String _contenu, String _type)
     {
         this.id = Annonce.currentID++;
-        this.auteur = _auteur;
+        this.auteur = GestionnaireUtilisateurs.getUtilisateur(_login);
         this.contenu = _contenu;
-        this.conversations = new ConversationNotifyList();
+        this.conversations = new ConversationNotifyList(this.getId());
         this.bannis = new ArrayList<>();
         //TO-DO
         //Vérifier si le type est bien dans la liste statique de type du gestionnaire d'annonces.
+    }
+    
+    //Constructeur nécessaire à la reconstruction des objets à partir du XML
+    public Annonce(int _id, String _login, String _contenu, String _type)
+    {
+        this.id = _id;
+        if(currentID <= this.id)
+        {
+            currentID = this.id + 1;
+        }
+        this.auteur = GestionnaireUtilisateurs.getUtilisateur(_login);
+        this.contenu = _contenu;
+        this.conversations = new ConversationNotifyList(this.getId());
+        this.bannis = new ArrayList<>();
     }
     
     public int getId()
@@ -46,6 +61,10 @@ public class Annonce implements JDOMSerializable{
     public Utilisateur getAuteur()
     {
         return this.auteur;
+    }
+
+    public ConversationNotifyList getConversations() {
+        return conversations;
     }
     
     public String getLoginAuteur()
@@ -68,49 +87,81 @@ public class Annonce implements JDOMSerializable{
         return this.bannis.contains(_login);
     }
     
-    public void addMessage(String _login, String _contenu) throws BannedUserException
+    public boolean isAuthorized(String _login)
     {
+        return _login.equals(this.getAuteur()) || GestionnaireUtilisateurs.getUtilisateur(_login).isAdmin();
+    }
+    
+    public Conversation getConversation(String _login)
+    {
+        for(Conversation c : this.conversations)
+        {
+            if(c.getIntermediaire().equals(_login))
+            {
+                return c;
+            }
+        }
+        return null;
+    }
+    
+    public void addMessage(String _login, String _contenu) throws BannedUserException, IncompatibleUserLevelException
+    {
+        if(GestionnaireUtilisateurs.getUtilisateur(_login).getUserLevel() < 2)
+            throw new IncompatibleUserLevelException();
+        
         if(this.isBan(_login))
         {
             throw new BannedUserException();
         }
         else
         {
-            this.conversations.add(new Message(_login, _contenu));
+            Message m = new Message(_login, _contenu);
+            Conversation c = this.getConversation(_login);
+            if(c == null)
+            {
+                c = new Conversation(_login, this.getId());
+            }
+            
+            c.add(m);
         }
     }
     
-    public void bannir(String _login, boolean banni) throws UserAlreadyBannedException
+    public void bannir(String _loginBan, boolean banni, String _login) throws UserAlreadyBannedException, IncompatibleUserLevelException
     {
-        // TO-DO
-        // Vérifier que le login existe
+        if(!_login.equals(this.getAuteur()) || !GestionnaireUtilisateurs.getUtilisateur(_login).isAdmin())
+            throw new IncompatibleUserLevelException();
+        
         if(banni)
         {
-            if(this.bannis.contains(_login))
+            if(this.bannis.contains(_loginBan))
             {
                 throw new UserAlreadyBannedException();
             }
             else
             {
-                this.bannis.add(_login);
+                this.bannis.add(_loginBan);
             }
         }
-        else if(this.bannis.contains(_login))
+        else if(this.bannis.contains(_loginBan))
         {
-            this.bannis.remove(_login);
+            this.bannis.remove(_loginBan);
         }
     }
 
-    @Override
+    public void setConversations(ConversationNotifyList _conversations) {
+        this.conversations = _conversations;
+    }
+
     public Element toElement() {
         Element eAnnonce     = new Element("Annonce");
         
         Element eId         = new Element("Id", String.valueOf(this.getId()));
         Element eAuteur     = new Element("Auteur", this.getLoginAuteur());
+        Element eContenu    = new Element("Contenu", this.getContenu());
         Element eReponses   = new Element("Reponses");
         Element eBannis     = new Element("Bannis");
         
-        for(Conversation c : this.conversations.getConversations())
+        for(Conversation c : this.conversations)
         {
             Element eIdConv     = new Element("IdConv", String.valueOf(c.getId()));
             eReponses.addContent(eIdConv);
@@ -126,6 +177,7 @@ public class Annonce implements JDOMSerializable{
         
         eAnnonce.addContent(eId);
         eAnnonce.addContent(eAuteur);
+        eAnnonce.addContent(eContenu);
         eAnnonce.addContent(eReponses);
         eAnnonce.addContent(eBannis);
         
