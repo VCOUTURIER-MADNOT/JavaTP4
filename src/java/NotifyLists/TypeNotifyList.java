@@ -82,7 +82,8 @@ public class TypeNotifyList extends NotifyList<String>{
         if (_o instanceof String)
         {
             String s = (String) _o;
-            eType = new Element("Type", s);
+            eType = new Element("Type");
+            eType.setText(s);
         }
         
         return eType;

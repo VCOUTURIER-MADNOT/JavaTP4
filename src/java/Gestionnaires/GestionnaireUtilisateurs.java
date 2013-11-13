@@ -9,21 +9,29 @@ package Gestionnaires;
 import Classes.Utilisateur;
 import Exceptions.IncompatibleUserLevelException;
 import Exceptions.LoginAlreadyUsedException;
+import Interfaces.IGestionnaireUtilisateurs;
 import NotifyLists.UtilisateurNotifyList;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 /**
  *
  * @author Valentin
  */
-public class GestionnaireUtilisateurs {
+public class GestionnaireUtilisateurs extends UnicastRemoteObject implements IGestionnaireUtilisateurs{
     
     private static UtilisateurNotifyList unl = new UtilisateurNotifyList();
     
-    public static void inscrire(String _login, String _password, String _nom) throws LoginAlreadyUsedException
+    public GestionnaireUtilisateurs() throws RemoteException
     {
-        if(getUtilisateur(_login)!= null)
+        super();
+    }
+    
+    public void inscrire(String _login, String _password, String _nom) throws LoginAlreadyUsedException, RemoteException
+    {
+        if(getUtilisateur(_login) == null)
         {
-            unl.add(new Utilisateur(_login, _password, _nom, 1));
+            unl.add(new Utilisateur(_login, _password, _nom, 2));
         }
         else
         {
@@ -31,7 +39,7 @@ public class GestionnaireUtilisateurs {
         }
     }
     
-    public static void desinscrire(String _login, String _loginAdmin) throws IncompatibleUserLevelException
+    public void desinscrire(String _login, String _loginAdmin) throws IncompatibleUserLevelException, RemoteException
     {
         if(getUtilisateur(_loginAdmin).isAdmin())
         {

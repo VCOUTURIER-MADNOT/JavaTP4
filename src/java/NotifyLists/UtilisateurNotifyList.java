@@ -54,13 +54,14 @@ public class UtilisateurNotifyList extends NotifyList<Utilisateur>{
         if(_o instanceof Utilisateur)
         {
             Utilisateur u = (Utilisateur) _o;
-            this.racine.removeContent(this.getElementFromId(String.valueOf(u.getLogin())));
+            Element e = this.getElementFromId(String.valueOf(u.getLogin()));
+            this.racine.removeContent(e);
         }   
     }
 
     @Override
     protected Element getElementFromId(String _id) {
-        List<Element> utilisateurs = this.racine.getChildren("Annonce");
+        List<Element> utilisateurs = this.racine.getChildren("Utilisateur");
         Iterator<Element> iterator = utilisateurs.iterator();
         Element eUtilisateur = null;
         while(iterator.hasNext())

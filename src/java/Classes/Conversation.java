@@ -101,8 +101,10 @@ public class Conversation{
     public Element toElement() {
         Element eConversation = new Element("Conversation");
         
-        Element eIdAnnonce = new Element("IdAnnonce", String.valueOf(this.annonceId));
-        Element eLoginIntermediaire = new Element("LoginInter", this.getIntermediaire());
+        Element eIdAnnonce = new Element("IdAnnonce");
+        eIdAnnonce.setText(String.valueOf(this.annonceId));
+        Element eLoginIntermediaire = new Element("LoginInter");
+        eLoginIntermediaire.setText(this.getIntermediaire());
         
         eConversation.setAttribute("Id", String.valueOf(this.id));
         eConversation.addContent(eIdAnnonce);

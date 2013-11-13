@@ -81,10 +81,14 @@ public class Utilisateur{
     public Element toElement() {
         Element eUtilisateur = new Element("Utilisateur");
         
-        Element eLogin = new Element("Login", this.getLogin());
-        Element ePassword = new Element("Password", this.getPassword());
-        Element eNom = new Element("Nom", this.getNom());
-        Element eUsrLvl = new Element ("UserLevel", String.valueOf(this.getUserLevel()));
+        Element eLogin = new Element("Login");
+        eLogin.setText(this.getLogin());
+        Element ePassword = new Element("Password");
+        ePassword.setText(this.getPassword());
+        Element eNom = new Element("Nom");
+        eNom.setText(this.getNom());
+        Element eUsrLvl = new Element ("UserLevel");
+        eUsrLvl.setText(String.valueOf(this.getUserLevel()));
         
         eUtilisateur.addContent(eLogin);
         eUtilisateur.addContent(ePassword);

@@ -9,16 +9,20 @@ package Classes;
 import Exceptions.BannedUserException;
 import Exceptions.IncompatibleUserLevelException;
 import Exceptions.UserAlreadyBannedException;
+import Gestionnaires.GestionnaireAnnonces;
 import Gestionnaires.GestionnaireUtilisateurs;
+import Interfaces.IAnnonce;
 import java.util.ArrayList;
 import NotifyLists.ConversationNotifyList;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import org.jdom2.Element;
 
 /**
  *
  * @author Valentin
  */
-public class Annonce{
+public class Annonce extends UnicastRemoteObject implements IAnnonce{
     
     private static int                currentID = 0;
     private int                       id;
@@ -28,19 +32,21 @@ public class Annonce{
     private ArrayList<String>         bannis;
     private String                    type;
     
-    public Annonce(String _login, String _contenu, String _type)
+    public Annonce(String _login, String _contenu, String _type) throws RemoteException
     {
         this.id = Annonce.currentID++;
         this.auteur = GestionnaireUtilisateurs.getUtilisateur(_login);
         this.contenu = _contenu;
         this.conversations = new ConversationNotifyList(this.getId());
         this.bannis = new ArrayList<>();
-        //TO-DO
-        //Vérifier si le type est bien dans la liste statique de type du gestionnaire d'annonces.
+        if(GestionnaireAnnonces.isTypeValide(_type))
+        {
+            this.type = _type;
+        }
     }
     
     //Constructeur nécessaire à la reconstruction des objets à partir du XML
-    public Annonce(int _id, String _login, String _contenu, String _type)
+    public Annonce(int _id, String _login, String _contenu, String _type) throws RemoteException
     {
         this.id = _id;
         if(currentID <= this.id)
@@ -58,21 +64,21 @@ public class Annonce{
         return this.id;
     }
     
-    public Utilisateur getAuteur()
+    public Utilisateur getAuteur() throws RemoteException
     {
         return this.auteur;
     }
 
-    public ConversationNotifyList getConversations() {
+    public ConversationNotifyList getConversations() throws RemoteException{
         return conversations;
     }
     
-    public String getLoginAuteur()
+    public String getLoginAuteur() throws RemoteException
     {
         return this.auteur.getLogin();
     }
     
-    public String getContenu()
+    public String getContenu() throws RemoteException
     {
         return this.contenu;
     }
@@ -87,12 +93,12 @@ public class Annonce{
         return this.bannis.contains(_login);
     }
     
-    public boolean isAuthorized(String _login)
+    public boolean isAuthorized(String _login) throws RemoteException
     {
         return _login.equals(this.getAuteur()) || GestionnaireUtilisateurs.getUtilisateur(_login).isAdmin();
     }
     
-    public Conversation getConversation(String _login)
+    public Conversation getConversation(String _login) throws RemoteException
     {
         for(Conversation c : this.conversations)
         {
@@ -104,7 +110,21 @@ public class Annonce{
         return null;
     }
     
-    public void addMessage(String _login, String _contenu) throws BannedUserException, IncompatibleUserLevelException
+    public Message getMessage(Conversation _conversation, int _idMessage, String _login)
+    {
+        ArrayList<Message> messages = _conversation.getMessages();
+        for(int i = 0 ; i < messages.size(); i++)
+        {
+            if(messages.get(i).getId() == _idMessage)
+            {
+                return messages.get(i);
+            }
+        }
+        
+        return null;
+    }
+    
+    public void addMessage(String _login, String _contenu) throws BannedUserException, IncompatibleUserLevelException, RemoteException
     {
         if(GestionnaireUtilisateurs.getUtilisateur(_login).getUserLevel() < 2)
             throw new IncompatibleUserLevelException();
@@ -126,7 +146,29 @@ public class Annonce{
         }
     }
     
-    public void bannir(String _loginBan, boolean banni, String _login) throws UserAlreadyBannedException, IncompatibleUserLevelException
+    public void supprimerMessage(Conversation _conversation, int _idMessage, String _login) throws IncompatibleUserLevelException, RemoteException
+    {
+        if(!this.isAuthorized(_login))
+            throw new IncompatibleUserLevelException();
+        
+        Message m = this.getMessage(_conversation, _idMessage, _login);
+        if(m != null)
+        {
+            _conversation.getMessages().remove(m);
+        }
+        
+    }
+    
+    public void supprimerConversation(Conversation _conversation, String _login) throws IncompatibleUserLevelException, RemoteException
+    {
+        if(!_login.equals(this.getAuteur()) || !GestionnaireUtilisateurs.getUtilisateur(_login).isAdmin())
+            throw new IncompatibleUserLevelException();
+        
+        _conversation.getMessages().clear();
+        this.conversations.remove(_conversation);
+    }
+    
+    public void bannir(String _loginBan, boolean banni, String _login) throws UserAlreadyBannedException, IncompatibleUserLevelException, RemoteException
     {
         if(!_login.equals(this.getAuteur()) || !GestionnaireUtilisateurs.getUtilisateur(_login).isAdmin())
             throw new IncompatibleUserLevelException();
@@ -152,24 +194,29 @@ public class Annonce{
         this.conversations = _conversations;
     }
 
-    public Element toElement() {
+    public Element toElement() throws RemoteException {
         Element eAnnonce     = new Element("Annonce");
         
-        Element eId         = new Element("Id", String.valueOf(this.getId()));
-        Element eAuteur     = new Element("Auteur", this.getLoginAuteur());
-        Element eContenu    = new Element("Contenu", this.getContenu());
+        Element eId         = new Element("Id");
+        eId.setText(String.valueOf(this.getId()));
+        Element eAuteur     = new Element("Auteur");
+        eAuteur.setText(this.getLoginAuteur());
+        Element eContenu    = new Element("Contenu");
+        eContenu.setText(this.getContenu());
         Element eReponses   = new Element("Reponses");
         Element eBannis     = new Element("Bannis");
         
         for(Conversation c : this.conversations)
         {
-            Element eIdConv     = new Element("IdConv", String.valueOf(c.getId()));
+            Element eIdConv     = new Element("IdConv");
+            eIdConv.setText(String.valueOf(c.getId()));
             eReponses.addContent(eIdConv);
         }
         
         for(String login : this.bannis)
         {
-            Element eLogin     = new Element("Login", login);
+            Element eLogin     = new Element("Login");
+            eLogin.setText(login);
             eReponses.addContent(eLogin);
         }
         

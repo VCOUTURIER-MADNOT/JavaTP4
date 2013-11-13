@@ -7,9 +7,11 @@
 package NotifyLists;
 
 import Classes.Annonce;
+import Exceptions.IncompatibleUserLevelException;
 import Exceptions.UserAlreadyBannedException;
 import Gestionnaires.GestionnaireAnnonces;
 import java.io.File;
+import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,7 +27,7 @@ public class AnnonceNotifyList extends NotifyList<Annonce>{
 
     public AnnonceNotifyList() {
         SAXBuilder sxb = new SAXBuilder();
-        this.xmlUrl = "Annonce.xml";
+        this.xmlUrl = "Annonces.xml";
         try
         {
             this.document = sxb.build(new File(this.xmlUrl));
@@ -84,7 +86,11 @@ public class AnnonceNotifyList extends NotifyList<Annonce>{
         if (_o instanceof Annonce)
         {
             Annonce a = (Annonce) _o;
-            eAnnonce = a.toElement();
+            try {
+                eAnnonce = a.toElement();
+            } catch (RemoteException ex) {
+                Logger.getLogger(AnnonceNotifyList.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
         return eAnnonce;
@@ -95,15 +101,23 @@ public class AnnonceNotifyList extends NotifyList<Annonce>{
         Annonce a = null;
         if(GestionnaireAnnonces.isTypeValide(_e.getAttributeValue("type")))
         {
-            a = new Annonce(Integer.valueOf(_e.getChildText("Id")), _e.getChildText("Auteur"), _e.getChildText("Contenu"), _e.getAttributeValue("type"));
+            try {
+                a = new Annonce(Integer.valueOf(_e.getChildText("Id")), _e.getChildText("Auteur"), _e.getChildText("Contenu"), _e.getAttributeValue("type"));
+            } catch (RemoteException ex) {
+                Logger.getLogger(AnnonceNotifyList.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
             //Génération de la liste des bannis
             Element eBannis = _e.getChild("Bannis");
             for(Element eLogin : eBannis.getChildren("Login"))
             {
                 try {
-                    a.bannir(eLogin.getText(), true);
+                    a.bannir(eLogin.getText(), true, "admin");
                 } catch (UserAlreadyBannedException ex) {
+                    Logger.getLogger(AnnonceNotifyList.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IncompatibleUserLevelException ex) {
+                    Logger.getLogger(AnnonceNotifyList.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (RemoteException ex) {
                     Logger.getLogger(AnnonceNotifyList.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

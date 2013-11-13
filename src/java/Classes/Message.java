@@ -59,9 +59,12 @@ public class Message{
     public Element toElement() {
         Element eMessage = new Element("Message");
         
-        Element eId = new Element("Id", String.valueOf(this.getId()));
-        Element eLogin = new Element("Login", this.getExpediteur());
-        Element eContenu = new Element("Contenu", this.getContenu());
+        Element eId = new Element("Id");
+        eId.setText(String.valueOf(this.getId()));
+        Element eLogin = new Element("Login");
+        eLogin.setText(this.getExpediteur());
+        Element eContenu = new Element("Contenu");
+        eContenu.setText(this.getContenu());
         
         eMessage.addContent(eId);
         eMessage.addContent(eLogin);
