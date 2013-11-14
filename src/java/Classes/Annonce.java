@@ -14,8 +14,13 @@ import Gestionnaires.GestionnaireUtilisateurs;
 import Interfaces.IAnnonce;
 import java.util.ArrayList;
 import NotifyLists.ConversationNotifyList;
+import Serveur.ServeurRMI;
+import java.rmi.AccessException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jdom2.Element;
 
 /**
@@ -43,6 +48,11 @@ public class Annonce extends UnicastRemoteObject implements IAnnonce{
         {
             this.type = _type;
         }
+        else
+        {
+            this.type = "inconnu";
+        }
+        this.bindRMI();
     }
     
     //Constructeur nécessaire à la reconstruction des objets à partir du XML
@@ -57,6 +67,26 @@ public class Annonce extends UnicastRemoteObject implements IAnnonce{
         this.contenu = _contenu;
         this.conversations = new ConversationNotifyList(this.getId());
         this.bannis = new ArrayList<>();
+        if(GestionnaireAnnonces.isTypeValide(_type))
+        {
+            this.type = _type;
+        }
+        else
+        {
+            this.type = "inconnu";
+        }
+        this.bindRMI();
+    }
+    
+    private void bindRMI()
+    {
+        try {
+            ServeurRMI.registry.bind("Serveur/Annonce"+this.getId(), this);
+        } catch (RemoteException ex) {
+            Logger.getLogger(Annonce.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AlreadyBoundException ex) {
+            Logger.getLogger(Annonce.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public int getId()
@@ -85,7 +115,9 @@ public class Annonce extends UnicastRemoteObject implements IAnnonce{
     
     public void setContenu(String _contenu)
     {
+        GestionnaireAnnonces.getAnnonces().reload();
         this.contenu = _contenu;
+        GestionnaireAnnonces.getAnnonces().saveXml();
     }
     
     public boolean isBan(String _login)
@@ -141,8 +173,15 @@ public class Annonce extends UnicastRemoteObject implements IAnnonce{
             {
                 c = new Conversation(_login, this.getId());
             }
+            else
+            {
+                this.conversations.remove(c);
+            }
             
             c.add(m);
+            this.conversations.add(c);
+            GestionnaireAnnonces.getAnnonces().remove(this);
+            GestionnaireAnnonces.getAnnonces().add(this);
         }
     }
     
@@ -154,7 +193,9 @@ public class Annonce extends UnicastRemoteObject implements IAnnonce{
         Message m = this.getMessage(_conversation, _idMessage, _login);
         if(m != null)
         {
+            GestionnaireAnnonces.getAnnonces().reload();
             _conversation.getMessages().remove(m);
+            GestionnaireAnnonces.getAnnonces().saveXml();
         }
         
     }
@@ -165,7 +206,9 @@ public class Annonce extends UnicastRemoteObject implements IAnnonce{
             throw new IncompatibleUserLevelException();
         
         _conversation.getMessages().clear();
+        GestionnaireAnnonces.getAnnonces().reload();
         this.conversations.remove(_conversation);
+        GestionnaireAnnonces.getAnnonces().saveXml();
     }
     
     public void bannir(String _loginBan, boolean banni, String _login) throws UserAlreadyBannedException, IncompatibleUserLevelException, RemoteException

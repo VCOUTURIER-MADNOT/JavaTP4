@@ -39,7 +39,7 @@ public class ConversationNotifyList extends NotifyList<Conversation>{
         
         for (Element eConversation : this.racine.getChildren("Conversation"))
         {
-            if(Integer.valueOf(eConversation.getChildText("idAnnonce")) ==  this.idAnnonce)
+            if(Integer.valueOf(eConversation.getChildText("IdAnnonce")) ==  this.idAnnonce)
                 this.add((Conversation) this.getObjectFromElement(eConversation), false);
         }
     }
@@ -82,7 +82,7 @@ public class ConversationNotifyList extends NotifyList<Conversation>{
     @Override
     protected Object getObjectFromElement(Element _e) {
         Conversation c = null;
-        if(Integer.valueOf(_e.getChildText("idAnnonce")) == this.idAnnonce)
+        if(Integer.valueOf(_e.getChildText("IdAnnonce")) == this.idAnnonce)
         {
             c = new Conversation(Integer.valueOf(_e.getAttributeValue("Id")), _e.getChildText("LoginInter"), this.idAnnonce);
             for(Element eMessage : _e.getChildren("Message"))

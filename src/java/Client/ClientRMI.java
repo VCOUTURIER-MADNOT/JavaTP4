@@ -1,5 +1,6 @@
 import Exceptions.BannedUserException;
 import Exceptions.IncompatibleUserLevelException;
+import Exceptions.LoginAlreadyUsedException;
 import Interfaces.IAnnonce;
 import Interfaces.IGestionnaireAnnonces;
 import Interfaces.IGestionnaireUtilisateurs;
@@ -29,19 +30,20 @@ public class ClientRMI {
             Registry registry = LocateRegistry.getRegistry(12345);
             GU = (IGestionnaireUtilisateurs) registry.lookup("Serveur/GestionnaireUtilisateurs");
             GA = (IGestionnaireAnnonces) registry.lookup("Serveur/GestionnaireAnnonces");
-            A1 = (IAnnonce) registry.lookup("Serveur/Annonce0");
-            A1.addMessage("Bidule", "Comment ça va ?");
+            A1 = (IAnnonce) registry.lookup("Serveur/Annonce2");
+            A1.addMessage("Bidule", "Ca va bien ?");
+            
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (NotBoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (IncompatibleUserLevelException ex) {
-            Logger.getLogger(ClientRMI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (BannedUserException ex) {
             Logger.getLogger(ClientRMI.class.getName()).log(Level.SEVERE, null, ex);
-        }		
+        } catch (IncompatibleUserLevelException ex) {
+            Logger.getLogger(ClientRMI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
  
 }

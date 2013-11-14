@@ -28,12 +28,14 @@ import java.util.logging.Logger;
  */
 public class GestionnaireAnnonces extends UnicastRemoteObject implements IGestionnaireAnnonces{
     
-    private static AnnonceNotifyList anl = new AnnonceNotifyList();
-    private static TypeNotifyList tnl = new TypeNotifyList();
+    private static AnnonceNotifyList anl;
+    private static TypeNotifyList tnl;
     
     public GestionnaireAnnonces() throws RemoteException
     {
         super();
+        tnl = new TypeNotifyList();
+        anl = new AnnonceNotifyList();
     }
     
     public void ajouterAnnonce(String _contenu, String _login, String _type) throws IncompatibleUserLevelException, RemoteException
@@ -43,13 +45,6 @@ public class GestionnaireAnnonces extends UnicastRemoteObject implements IGestio
         
         Annonce a = new Annonce(_login, _contenu, _type);
         anl.add(a);
-        try {
-            ServeurRMI.registry.bind("Serveur/Annonce"+a.getId(), a);
-        } catch (AlreadyBoundException ex) {
-            Logger.getLogger(GestionnaireAnnonces.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (AccessException ex) {
-            Logger.getLogger(GestionnaireAnnonces.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
     public void ajouterType(String _type, String _login) throws IncompatibleUserLevelException
@@ -132,7 +127,7 @@ public class GestionnaireAnnonces extends UnicastRemoteObject implements IGestio
         return liste;
     }
     
-    public static ArrayList<Annonce> getAnnonces()
+    public static AnnonceNotifyList getAnnonces()
     {
         return anl;
     }

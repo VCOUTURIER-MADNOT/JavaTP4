@@ -4,13 +4,17 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
-
-
 <Utilisateurs>
-    <Utilisateur>
-        <Login>admin</Login>
-        <Password>admin</Password>
-        <Nom>admin</Nom>
-        <UserLevel>3</UserLevel>
-    </Utilisateur>
+  <Utilisateur>
+    <Login>admin</Login>
+    <Password>admin</Password>
+    <Nom>admin</Nom>
+    <UserLevel>3</UserLevel>
+  </Utilisateur>
+  <Utilisateur>
+    <Login>Bidule</Login>
+    <Password>BiduleMDP</Password>
+    <Nom>Bid</Nom>
+    <UserLevel>2</UserLevel>
+  </Utilisateur>
 </Utilisateurs>

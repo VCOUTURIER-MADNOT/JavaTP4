@@ -74,7 +74,7 @@ public abstract class NotifyList<E> extends ArrayList<E> {
 		return res;
 	}
 	
-	private void reload()
+	public void reload()
 	{
 		SAXBuilder sb = new SAXBuilder();
 		
@@ -91,7 +91,7 @@ public abstract class NotifyList<E> extends ArrayList<E> {
 		System.out.println("Liste actualis�e");
 	}
 	
-	private void saveXml()
+	public void saveXml()
 	{
 	    XMLOutputter sortie = new XMLOutputter(Format.getPrettyFormat());
 	    

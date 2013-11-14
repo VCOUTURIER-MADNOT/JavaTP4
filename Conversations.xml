@@ -4,8 +4,28 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
-
-
 <Conversations>
-    
+  <Conversation Id="0">
+    <IdAnnonce>2</IdAnnonce>
+    <LoginInter>admin</LoginInter>
+    <Message>
+      <Id>0</Id>
+      <Login>admin</Login>
+      <Contenu>reSalut</Contenu>
+    </Message>
+    <Message>
+      <Id>1</Id>
+      <Login>admin</Login>
+      <Contenu>reCoucou</Contenu>
+    </Message>
+  </Conversation>
+  <Conversation Id="1">
+    <IdAnnonce>2</IdAnnonce>
+    <LoginInter>Bidule</LoginInter>
+    <Message>
+      <Id>1</Id>
+      <Login>Bidule</Login>
+      <Contenu>Ca va bien ?</Contenu>
+    </Message>
+  </Conversation>
 </Conversations>
