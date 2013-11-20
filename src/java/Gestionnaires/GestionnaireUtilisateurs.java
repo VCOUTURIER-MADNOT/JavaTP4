@@ -7,12 +7,15 @@
 package Gestionnaires;
 
 import Classes.Utilisateur;
+import Exceptions.ImpossibleConnexionException;
 import Exceptions.IncompatibleUserLevelException;
 import Exceptions.LoginAlreadyUsedException;
 import Interfaces.IGestionnaireUtilisateurs;
 import NotifyLists.UtilisateurNotifyList;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -66,5 +69,24 @@ public class GestionnaireUtilisateurs extends UnicastRemoteObject implements IGe
         }
 
         return utilisateur;
+    }
+    
+    public boolean connect(String _login, String _password) throws ImpossibleConnexionException, RemoteException
+    {
+        Utilisateur u = getUtilisateur(_login);
+        if(u == null || !(u.getPassword().equals(_password)))
+            throw new ImpossibleConnexionException();
+       
+        return true;
+    }
+    
+    public HashMap<String, String> getInformations(String _login) throws RemoteException
+    {
+        Utilisateur u = getUtilisateur(_login);
+        HashMap<String, String> infos = new HashMap<String, String>();
+        infos.put("Nom", u.getNom());
+        infos.put("Login", u.getLogin());
+        
+        return infos;
     }
 }

@@ -19,4 +19,5 @@ public interface IGestionnaireAnnonces extends Remote{
     public void supprimerAnnonce(int _idAnnonce, String _login) throws IncompatibleUserLevelException, RemoteException;
     public void ajouterType(String _type, String _login) throws IncompatibleUserLevelException, RemoteException;
     public void supprimerType(String _type, String _login) throws IncompatibleUserLevelException, RemoteException;
+    public String getAnnoncesHTMLResume() throws RemoteException;
 }

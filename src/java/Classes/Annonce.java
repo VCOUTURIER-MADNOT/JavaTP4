@@ -273,4 +273,10 @@ public class Annonce extends UnicastRemoteObject implements IAnnonce{
         
         return eAnnonce;
     }
+    
+    public String toHTMLResume() throws RemoteException
+    {
+        String res = "<a href='annonce"+this.getId()+"'>" + this.getContenu().substring(0, 20) + "..." +"</a>\n";
+        return res;
+    }
 }

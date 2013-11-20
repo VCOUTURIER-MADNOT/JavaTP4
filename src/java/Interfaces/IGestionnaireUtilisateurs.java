@@ -6,10 +6,12 @@
 
 package Interfaces;
 
+import Exceptions.ImpossibleConnexionException;
 import Exceptions.IncompatibleUserLevelException;
 import Exceptions.LoginAlreadyUsedException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
 /**
  *
@@ -18,4 +20,6 @@ import java.rmi.RemoteException;
 public interface IGestionnaireUtilisateurs extends Remote{
     public void inscrire(String _login, String _password, String _nom) throws LoginAlreadyUsedException, RemoteException;
     public void desinscrire(String _login, String _loginAdmin) throws IncompatibleUserLevelException, RemoteException;
+    public boolean connect(String _login, String _password) throws ImpossibleConnexionException, RemoteException;
+    public HashMap<String, String> getInformations(String _login) throws RemoteException;
 }

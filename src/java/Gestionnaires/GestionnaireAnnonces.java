@@ -131,4 +131,15 @@ public class GestionnaireAnnonces extends UnicastRemoteObject implements IGestio
     {
         return anl;
     }
+    
+    public String getAnnoncesHTMLResume() throws RemoteException
+    {
+        String res = "<ul>";
+        for(Annonce a : getAnnonces())
+        {
+            res += "<li>" + a.toHTMLResume() + "</li>";
+        }
+        res += "</ul>";
+        return res;
+    }
 }
